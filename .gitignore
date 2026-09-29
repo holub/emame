@@ -1,0 +1,7 @@
+roms
+software
+# Local emscripten build outputs (absolute symlinks into the external MAME
+# checkout) — never commit these.
+mame.html
+mame.js
+mame.wasm

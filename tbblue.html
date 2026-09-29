@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>ZX Spectrum Next</title>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="text/javascript" src="mame-loader.js"></script>
+    <script type="text/javascript" src="theme-simple.js"></script>
+    <script type="text/javascript">
+      MAMEThemeSimple.mount(document.getElementById("app"), {
+        driver:  "tbblue",
+        files: [
+          { url: "roms/tbblue.zip",   path: "roms/tbblue.zip" },
+          { url: "software/next.chd", path: "next.chd" },
+        ],
+        args: [
+          //"-verbose",
+          "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
+          "-nokeepaspect", // square target pixels: logical pixel is 2x1 content (half-width horizontal), 720x576 = content 720x288 x(1,2), crisp at integer k (fs keeps aspect, theme restores fill on exit)
+          //"-resolution", "720x576", // windowed frame, device px (theme re-issues as CSS points)
+          "-resolution", "1080x864", // *1.5 example
+          "-hard1", "next.chd"
+        ],
+        // Optional: "diff" dir for writable CHD differencing images.
+        // Needed only by harddisk drivers (MAME opens the CHD writable
+        // first); omit for cartridge/tape/floppy-only drivers. Loader
+        // default is true.
+        diffDir: true,
+        // Optional: keeps the loader's chain state in sync with -args and
+        // re-asserts it after boot. Omit to leave MAME's default chain
+        // alone (loader default is "unfiltered").
+        bgfxInitialChain: "unfiltered",
+        nmi: true,
+      });
+    </script>
+  </body>
+</html>

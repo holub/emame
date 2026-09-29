@@ -1,0 +1,98 @@
+name: CI (Emscripten)
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+    - uses: actions/checkout@main
+
+    - name: Checkout MAME master
+      uses: actions/checkout@main
+      with:
+        repository: mamedev/mame
+        ref: master
+        fetch-depth: 0
+        path: mame
+
+    - name: Merge emame-wip
+      run: |
+        git -C mame remote add emame https://github.com/holub/mame.git
+        git -C mame fetch emame emame-wip
+        git -C mame -c user.name=ci -c user.email=ci@example.com merge --no-edit emame/emame-wip
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools
+
+    - name: Setup ccache
+      uses: Chocobo1/setup-ccache-action@v1.5.9
+
+    - name: Prepare for complay cache
+      run: |
+        grep complay mame/makefile >mame/complay.prehash
+        cat mame/scripts/build/complay.py >>mame/complay.prehash
+
+    - name: Cache complay-ed layouts
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/mame/build/generated/mame/layout
+        key: complay_${{ hashFiles('mame/complay.prehash', 'mame/**/*.lay') }}
+
+    - name: Touch complay-ed layouts
+      run: |
+        if [ -d mame/build/generated/mame/layout ]; then
+          find mame/build/generated/mame/layout -maxdepth 1 -name '*.lh' -exec touch {} +
+        fi
+
+    - name: Install emscripten
+      run: |
+        git clone --filter=tree:0 https://github.com/emscripten-core/emsdk.git emsdk
+        cd emsdk
+        ./emsdk install 6.0.9
+        ./emsdk activate 6.0.9
+
+    - name: Build
+      working-directory: mame
+      env:
+        SUBTARGET: mame
+        SOURCES: sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp
+        TOOLS: 0
+        REGENIE: 1
+        PRECOMPILE: 0
+        DEBUG: 0
+        OPTIMIZE: 3
+        LDOPTS: -lembind -sASSERTIONS=1
+      run: |
+        source ../emsdk/emsdk_env.sh
+        export OVERRIDE_CC="ccache emcc"
+        export OVERRIDE_CXX="ccache em++"
+        emmake make -j$(nproc)
+
+    - name: Prepare flat web artifact
+      run: |
+        mkdir -p artifact artifact/cfg artifact/nvram artifact/roms artifact/software
+        cp mame/mame.html mame/mame.js mame/mame.wasm artifact/
+        cp mame/COPYING artifact/MAME-COPYING
+        cp -r mame/docs/legal artifact/MAME-LICENSES
+        cp mame-loader.js theme-simple.js RESOLUTION.md README.md LICENSE res-info.py start-web.sh *.html artifact/
+        cp -r cfg/. artifact/cfg/
+        cp -r nvram/. artifact/nvram/
+        echo "Place ROM files here" > artifact/roms/dir.txt
+        echo "Place software files here" > artifact/software/dir.txt
+
+    - uses: actions/upload-artifact@main
+      with:
+        name: mame-web-emscripten-${{ github.sha }}
+        path: artifact
