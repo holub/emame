@@ -67,7 +67,7 @@ jobs:
       working-directory: mame
       env:
         SUBTARGET: mame
-        SOURCES: sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp
+        SOURCES: sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp,pacman/pacman.cpp,misc/epos.cpp,pacman/pengo.cpp,nintendo/dkong.cpp,galaxian/galaxian.cpp
         TOOLS: 0
         REGENIE: 1
         PRECOMPILE: 0

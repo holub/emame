@@ -29,6 +29,9 @@ import sys
 import xml.etree.ElementTree as ET
 
 PAGES = {
+    "frogger": ["frogger.html"],
+    "pacman": ["pacman.html"],
+    "dkong": ["dkong.html"],
     "tbblue": ["tbblue.html"],
     "tsconf2": ["tsconf2-img.html", "tsconf2-trd.html", "tsconf2-spg.html"],
     "scorpiongmx": ["scorpiongmx.html"],

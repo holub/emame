@@ -20,7 +20,7 @@ if command -v ccache >/dev/null 2>&1; then
 	export OVERRIDE_CXX="ccache em++"
 fi
 export SUBTARGET=mame
-export SOURCES="sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp"
+export SOURCES="sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp,pacman/pacman.cpp,misc/epos.cpp,pacman/pengo.cpp,nintendo/dkong.cpp,galaxian/galaxian.cpp"
 export TOOLS=0
 # REGENIE rewrites all *.make files, and every object depends on its
 # makefile ($(MAKEFILE) prerequisite), so an unconditional REGENIE=1 ==
