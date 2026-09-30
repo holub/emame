@@ -25,12 +25,16 @@ export TOOLS=0
 # REGENIE rewrites all *.make files, and every object depends on its
 # makefile ($(MAKEFILE) prerequisite), so an unconditional REGENIE=1 ==
 # full rebuild every run. Gate it on a stamp of the inputs instead:
-# regen when SOURCES or genie.lua changed (guarantees the requested
-# driver set), otherwise stay incremental.
+# regen when SOURCES or genie.lua changed, otherwise stay incremental.
+# The --pre-js/--post-js files below are link inputs but not make
+# dependencies of the target, so when they change the outputs are
+# deleted to force a relink.
 STAMP_FILE="$MAME_SRC/build/.build_stamp"
-STAMP_NEW="$SOURCES $(md5sum "$MAME_SRC/scripts/genie.lua" | cut -d' ' -f1)"
+STAMP_INPUTS="$MAME_SRC/scripts/genie.lua $MAME_SRC/src/osd/modules/sound/js_sound.js $MAME_SRC/scripts/resources/emscripten/emscripten_post.js"
+STAMP_NEW="$SOURCES $(cat $STAMP_INPUTS | md5sum | cut -d' ' -f1)"
 if [ ! -f "$STAMP_FILE" ] || [ "$(cat "$STAMP_FILE")" != "$STAMP_NEW" ]; then
   export REGENIE=1
+  rm -f "$MAME_SRC/mame.html" "$MAME_SRC/mame.js" "$MAME_SRC/mame.wasm"
   printf '%s' "$STAMP_NEW" > "$STAMP_FILE"
 fi
 export PRECOMPILE=0

@@ -30,6 +30,7 @@ import xml.etree.ElementTree as ET
 
 PAGES = {
     "frogger": ["mame/galaxian/frogger.html"],
+    "galaxian": ["mame/galaxian/galaxian.html"],
     "pacman": ["mame/pacman/pacman.html"],
     "dkong": ["mame/nintendo/dkong.html"],
     "tbblue": ["mame/sinclair/next/tbblue.html"],
@@ -47,10 +48,18 @@ PAGES = {
     "specpls3": ["mame/sinclair/specpls3.html"],
 }
 
+ROOT = os.path.dirname(os.path.abspath(__file__))
 MAME_SRC = os.path.abspath(
     os.environ.get("MAME_SRC") or
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mame"))
-MAME = os.environ.get("MAME", os.path.join(MAME_SRC, "mame"))
+    os.path.join(ROOT, "..", "mame"))
+# default to the headless js wrapper (the shipped binary — knows every
+# driver in the build); $MAME overrides as before
+_JS = os.path.join(ROOT, "mame-js")
+_NATIVE = os.path.join(MAME_SRC, "mame")
+MAME = os.environ.get("MAME", _JS if os.access(_JS, os.X_OK) else _NATIVE)
+# optional native binary for boot-time view dumps (the js build cannot
+# boot machines without a browser); $MAME_NATIVE overrides
+MAME_NATIVE = os.environ.get("MAME_NATIVE", _NATIVE)
 MAX_W, MAX_H = 800, 600
 TARGET = 4.0 / 3.0
 
@@ -129,7 +138,7 @@ def rompath():
     return local if os.path.isdir(local) else None
 
 
-def driver_views(driver, seconds=5):
+def driver_views(driver, seconds=5, binary=None):
     """Run the binary headless with VIEWS_LUA; return (default, [(name, aspect, bounds)]) or None."""
     import tempfile
     import shutil
@@ -140,7 +149,7 @@ def driver_views(driver, seconds=5):
     try:
         env = dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy")
         # sandbox every writable dir so the run creates nothing in cwd
-        cmd = [MAME, driver, "-autoboot_script", script]
+        cmd = [binary or MAME, driver, "-autoboot_script", script]
         for d in ("cfg", "nvram", "input", "state", "snapshot", "diff",
                   "comment", "share"):
             os.makedirs(os.path.join(workdir, d), exist_ok=True)
@@ -178,11 +187,19 @@ def driver_views(driver, seconds=5):
         os.unlink(script)
         shutil.rmtree(workdir, ignore_errors=True)
 
+def views_with_fallback(driver):
+    """driver_views on the default binary; if it can't run the machine and a
+    native binary exists, retry there (the js build can't boot machines)."""
+    got = driver_views(driver)
+    if (got is None and MAME != MAME_NATIVE
+            and os.access(MAME_NATIVE, os.X_OK)):
+        got = driver_views(driver, binary=MAME_NATIVE)
+    return got
 
 def views_main(drivers):
     failed = False
     for driver in drivers:
-        got = driver_views(driver)
+        got = views_with_fallback(driver)
         if got is None:
             print(f"{driver}: NOROMS (missing files, machine cannot run)")
             failed = True
@@ -198,7 +215,7 @@ def views_main(drivers):
 
 def default_view(driver):
     """(name, effective_aspect, bounds, has_art) of the boot default view; None if un-runnable."""
-    got = driver_views(driver)
+    got = views_with_fallback(driver)
     if got is None:
         return None
     for name, aspect, bounds, art, is_default in got[1]:

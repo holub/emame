@@ -1,0 +1,11 @@
+#!/bin/sh
+# mame-js — headless CLI wrapper around the Emscripten MAME build.
+# Finds node (prefer the copy shipped with emsdk — the bundle needs
+# >= 18.3 and a stale node on PATH would break it) and runs mame-node.mjs.
+NODE=$(ls -d "$HOME"/workspace/emsdk/node/*/bin/node 2>/dev/null | sort -V | tail -1)
+[ -x "$NODE" ] || NODE=$(command -v node 2>/dev/null || true)
+if [ -z "$NODE" ]; then
+	echo "mame-js: no node found (install node, or point at emsdk)" >&2
+	exit 127
+fi
+exec "$NODE" "$(dirname "$0")/mame-node.mjs" "$@"

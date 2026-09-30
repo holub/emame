@@ -14,7 +14,7 @@ The repository contains the driver pages, browser loader/theme, per-machine conf
 
 ## Local build and run
 
-Use an Emscripten SDK and a MAME checkout on `emame-wip`. `MAME_SRC` defaults to `../mame/` relative to this repository; set it to another MAME source checkout when needed. `res-info.py` runs `$MAME_SRC/mame` unless `MAME` explicitly overrides the executable. `EMSDK_DIR` defaults to `~/workspace/emsdk`.
+Use an Emscripten SDK and a MAME checkout on `emame-wip`. `MAME_SRC` defaults to `../mame/` relative to this repository; set it to another MAME source checkout when needed. `EMSDK_DIR` defaults to `~/workspace/emsdk`.
 
 ```sh
 EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
@@ -26,9 +26,21 @@ EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 
 `start-web.sh` starts Python's built-in static HTTP server from the emame directory on port 8080. After building, run `./start-web.sh` and open `http://localhost:8080/index.html` (or a machine page such as `mame/sinclair/next/tbblue.html`) in a browser. Stop the server with Ctrl+C. ROMs and software must be supplied separately in the ignored `roms/` and `software/` directories.
 
+### Headless CLI (`mame-js`)
+
+`mame-js` runs the Emscripten build on the desktop through node — no browser, no native build. It picks the newest node from `$EMSDK_DIR` (falling back to `node` on `PATH`); the bundle requires node ≥ 18.3. The launcher (`mame-node.mjs`) stubs the `window` object SDL probes at startup and maps host paths into the emscripten filesystem: ROM zips are preloaded from `roms/` by default, and any file/dir argument that exists on the host (`-rompath`, `-autoboot_script`, `-*_directory`) is copied or created at the same path inside MEMFS. Use `--no-rom-preload` to skip the default.
+
+```sh
+./mame-js -listxml galaxian            # driver info from the shipped binary
+./mame-js -verifyroms frogger          # ROM presence + checksum check
+for d in frogger pacman dkong galaxian; do ./mame-js -verifyroms $d || echo "MISSING: $d"; done
+```
+
+A single-set `-verifyroms` exits nonzero when the set is missing or bad — that is the reliable ROM-gate form; multi-set invocations skip missing sets silently and may exit zero. Booting machines (running a driver) still requires a browser; info and audit commands are the headless surface.
+
 ### `res-info.py`
 
-`res-info.py` checks the page `-resolution` arguments against frame sizes derived from MAME's `-listxml` data and the driver's boot-default view. With no driver arguments it checks every configured page; pass driver short names to limit the check. It prints `OK` or `DIFFERS` per driver and exits nonzero if a page's current resolution differs from the suggestion. If a driver cannot be run because ROMs are missing, it falls back to a 4:3 suggestion. `MAME_SRC` selects the source checkout (default `../mame/`); the binary is `$MAME_SRC/mame`, with `MAME` available to override the executable. Headless runs use `MAME_ROMPATH` when set, otherwise this repository's `roms/` directory if present.
+`res-info.py` checks the page `-resolution` arguments against frame sizes derived from MAME's `-listxml` data and the driver's boot-default view. With no driver arguments it checks every configured page; pass driver short names to limit the check. It prints `OK` or `DIFFERS` per driver and exits nonzero if a page's current resolution differs from the suggestion. If a driver cannot be run because ROMs are missing, it falls back to a 4:3 suggestion. `-listxml` runs through `./mame-js` when available (the shipped binary knows every driver in the build), otherwise `$MAME_SRC/mame`; `MAME` still overrides the executable. Boot-time view dumps first try the same binary, then fall back to `MAME_NATIVE` (default `$MAME_SRC/mame`) when present, since the js build cannot boot machines without a browser. Headless runs use `MAME_ROMPATH` when set, otherwise this repository's `roms/` directory if present.
 
 ```sh
 python3 res-info.py                       # check all configured pages
@@ -50,6 +62,8 @@ These changes are applied on top of `mame/master` by the CI workflow:
 - Callback-delta run-loop pacing and CPU-bound unthrottled fast-forward.
 - Runtime bgfx chain switching through `osd_common_t::set_bgfx_screen_chain`, `renderer_bgfx::set_effect_chain`, `chain_manager::set_chain_by_name`, and `osd_renderer::set_effect_chain`.
 - Emscripten `EXPORTED_FUNCTIONS` additions and `emscripten_post.js` cwrap bindings deferred until first call.
+- `infoxml.cpp` runs `-listxml` tasks with `std::launch::deferred` on Emscripten (no pthreads; the default `std::launch::async` throws), keeping headless `-listxml` working under node.
+- `emscripten_post.js` MEMFS preload hook (`JSMAME.preload`) for the headless node CLI.
 - Emscripten buildability updates in `scripts/src/osd/modules.lua` and `src/lib/util/chd.cpp`.
 - `js_sound.js` underrun padding uses the last played sample (silence before the first sample), avoiding NaNs.
 
