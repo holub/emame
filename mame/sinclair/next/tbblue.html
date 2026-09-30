@@ -21,8 +21,7 @@
           //"-verbose",
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
           "-nokeepaspect", // square target pixels: logical pixel is 2x1 content (half-width horizontal), 720x576 = content 720x288 x(1,2), crisp at integer k (fs keeps aspect, theme restores fill on exit)
-          //"-resolution", "720x576", // windowed frame, device px (theme re-issues as CSS points)
-          "-resolution", "1080x864", // *1.5 example
+          "-resolution", "1080x864", //base: 720x576 *1.5 example
           "-hard1", "next.chd"
         ],
         // Optional: "diff" dir for writable CHD differencing images.

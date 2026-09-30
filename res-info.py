@@ -3,12 +3,12 @@
 
 Rule: take the primary screen (bare tag="screen"; slot screens ignored),
 compute the visible area from blanking (hbstart-hbend x vbstart-vbend,
-falling back to width x height), then pick integer multipliers mx,my in
-1..3 with the result inside an 800x600 box so the page can show the frame
-1:1 windowed. Minimize |aspect - view-aspect|, where view-aspect is the
+falling back to width x height), then search integer multipliers per axis
+within an 800x900 box, retaining 1x when that visible axis already exceeds
+its bound. Minimize |aspect - view-aspect|, where view-aspect is the
 effective aspect of the driver's boot default view read from the binary
 itself (headless Lua dump, one run per driver); fall back to 4:3 when the
-driver has no runnable ROMs. Break ties toward more pixels. When the
+driver has no runnable ROMs. Break ties toward fewer pixels. When the
 default view is an artwork composite (has_art), integer screen scaling
 cannot express its aspect, so fit the view bounds into the box instead,
 floored at the screen suggestion so the embedded screen keeps natural size.
@@ -60,7 +60,7 @@ MAME = os.environ.get("MAME", _JS if os.access(_JS, os.X_OK) else _NATIVE)
 # optional native binary for boot-time view dumps (the js build cannot
 # boot machines without a browser); $MAME_NATIVE overrides
 MAME_NATIVE = os.environ.get("MAME_NATIVE", _NATIVE)
-MAX_W, MAX_H = 800, 600
+MAX_W, MAX_H = 800, 900
 TARGET = 4.0 / 3.0
 
 
@@ -85,13 +85,13 @@ def visible(display):
 
 def suggest(vw, vh, target=TARGET):
     best = None
-    for mx in (1, 2, 3):
-        for my in (1, 2, 3):
+    max_mx = max(1, MAX_W // vw)
+    max_my = max(1, MAX_H // vh)
+    for mx in range(1, max_mx + 1):
+        for my in range(1, max_my + 1):
             w, h = vw * mx, vh * my
-            if w > MAX_W or h > MAX_H:
-                continue
             err = abs(w / h - target)
-            key = (round(err, 4), -(w * h))
+            key = (round(err, 4), w * h)
             if best is None or key < best[0]:
                 best = (key, (w, h, mx, my, err))
     return best[1]
@@ -102,6 +102,18 @@ def current_resolution(page):
         text = f.read()
     m = re.search(r'"-resolution",\s*"(\d+)x(\d+)"', text)
     return f"{m.group(1)}x{m.group(2)}" if m else "-"
+
+def current_marker(current, suggested):
+    if current == suggested:
+        return "OK"
+    cur = re.fullmatch(r"(\d+)x(\d+)", current)
+    sug = re.fullmatch(r"(\d+)x(\d+)", suggested)
+    if cur and sug:
+        cw, ch = map(int, cur.groups())
+        sw, sh = map(int, sug.groups())
+        if cw > 0 and ch > 0 and sw > 0 and sh > 0 and cw * sh == ch * sw:
+            return f"x{cw / sw:g}"
+    return current
 
 
 VIEWS_LUA = """-- dump views of the primary UI target (lowest index): DEFAULT <n>, VIEW <i>|<name>|<aspect>|<bounds>|<art>
@@ -229,7 +241,10 @@ def main(drivers):
     xml = subprocess.run([MAME, "-listxml"] + drivers,
                          capture_output=True, text=True, check=True).stdout
     machines = {m.get("name"): m for m in ET.fromstring(xml).iter("machine")}
-    rows = []
+    driver_width = max((len(driver) for driver in drivers), default=6)
+    fmt = f"%-{driver_width}s  %-9s %-24s  %-8s %-9s %s"
+    print(("# " + fmt % ("driver", "visible", "default-view", "aspect",
+                         "suggested", "current")).rstrip(), flush=True)
     failed = False
     for driver in drivers:
         machine = machines[driver]
@@ -255,17 +270,11 @@ def main(drivers):
         w, h = frame
         pages = PAGES.get(driver, [])
         currents = {current_resolution(os.path.join(root, p)) for p in pages}
-        status = "OK" if currents == {f"{w}x{h}"} else "DIFFERS"
-        failed |= status == "DIFFERS"
-        rows.append((driver, f"{vw}x{vh}", vname, f"{vaspect:.4f}",
-                     f"{w}x{h}", ",".join(sorted(currents)), status))
-    dw = max(len(r[0]) for r in rows)
-    dvw = max(len(r[2]) for r in rows)
-    fmt = f"%-{dw}s  %-9s %-{dvw}s  %-8s %-9s %-9s %s"
-    print(("# " + fmt % ("driver", "visible", "default-view", "aspect",
-                         "suggested", "current", "status")).rstrip())
-    for r in rows:
-        print(fmt % r)
+        suggested = f"{w}x{h}"
+        current_print = ",".join(sorted(current_marker(c, suggested) for c in currents))
+        failed |= currents != {suggested}
+        print(fmt % (driver, f"{vw}x{vh}", vname, f"{vaspect:.4f}",
+                     suggested, current_print), flush=True)
     sys.exit(1 if failed else 0)
 
 
