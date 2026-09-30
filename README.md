@@ -20,7 +20,7 @@ Use an Emscripten SDK and a MAME checkout on `emame-wip`. `MAME_SRC` defaults to
 EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 ```
 
-`build.sh` builds in `MAME_SRC` and links the generated `mame.html`, `mame.js`, and `mame.wasm` into this web root for local serving. It refuses to replace regular files at those paths; remove or move such files before building.
+`build.sh` compiles the sources in `MAME_SRC` but keeps objects, generated sources, and genie projects in this repository's `build/` (`BUILDDIR`). `SEPARATE_BIN=1` puts the linked Emscripten target in `build/asmjs/bin/`; the script copies `mame.html`, `mame.js`, and `mame.wasm` to this web root for serving. A native build in the MAME checkout uses its own `build/`, so the two build trees do not clobber each other or force recompiles.
 
 ### `start-web.sh`
 

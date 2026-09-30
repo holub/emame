@@ -1,7 +1,8 @@
 roms
 software
-# Local emscripten build outputs (absolute symlinks into the external MAME
-# checkout) — never commit these.
+# Local emscripten build directory (objects, generated files, projects) and
+# the build outputs copied to the web root — never commit these.
+build/
 mame.html
 mame.js
 mame.wasm
