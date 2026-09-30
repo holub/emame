@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>TSConf :: SPG</title>
+    <title>TSConf :: SD + NeoGS</title>
+    <base href="../../../">
   </head>
   <body>
     <div id="app"></div>
@@ -14,16 +15,21 @@
         driver:  "tsconf2",
         files: [
           { url: "cfg/tsconf2.cfg",         path: "cfg/tsconf2.cfg" },
+          { url: "nvram/tsconf2/glukrs_sd", path: "nvramsd/tsconf2/glukrs" },
           { url: "roms/tsconf.zip",         path: "roms/tsconf.zip" },
           { url: "roms/kb_ms_natural.zip",  path: "roms/kb_ms_natural.zip" },
-          { url: "software/cfparallax.spg", path: "cfparallax.spg" },
+          { url: "roms/zxbus_neogs.zip",    path: "roms/zxbus_neogs.zip" },
+          { url: "software/wc.img",         path: "wc.img" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
           "-resolution", "720x576",
           "-nokeepaspect", // square pixels: content 360x288 natively square, 720x576 = 2x2
-          "-dump", "cfparallax.spg"
+          "-zxbus1", "neogs",
+          "-ay_slot", "ay_turbosound",
+          "-hard1", "wc.img"
         ],
+        nvramDir: "nvramsd",
       });
     </script>
   </body>

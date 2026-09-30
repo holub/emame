@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>ZX Spectrum 48K</title>
+    <title>ZX Spectrum +3</title>
+    <base href="../../">
   </head>
   <body>
     <div id="app"></div>
@@ -11,16 +12,15 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "spectrum",
+        driver:  "specpls3",
         files: [
-          { url: "roms/spectrum.zip",        path: "roms/spectrum.zip" },
-          { url: "software/AYtest_v0.2.tap", path: "AYtest_v0.2.tap" },
+          { url: "roms/specpl2a.zip", path: "roms/specpl2a.zip" },
+          { url: "roms/specpls3.zip", path: "roms/specpls3.zip" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
           "-nokeepaspect", // square pixels: content 352x296, 704x592 = 2x2
           "-resolution", "704x592",
-          "-cassette", "AYtest_v0.2.tap"
         ],
       });
     </script>

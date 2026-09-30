@@ -2,11 +2,11 @@
 
 `emame` aims to provide a general web environment for running anything supported by MAME. The current pages and CI build cover a selected set of machines; broad MAME coverage is the goal. [Emularity](https://github.com/db48x/emularity) is a predecessor project for browser-based emulation.
 
-The repository contains the driver pages, browser loader/theme, per-machine configuration, and a CI workflow that builds MAME `master` merged with the `emame-wip` branch in `holub/mame`.
+The repository contains the driver pages, browser loader/theme, per-machine configuration, and a CI workflow that builds MAME `master` merged with the [`emame-wip` branch](https://github.com/mamedev/mame/compare/master...holub:mame:emame-wip).
 
 ## Layout
 
-- Top-level `*.html` files are the machine pages; `index.html` is the page directory.
+- Machine pages live under `mame/<source-directory>/`, mirroring their `src/mame/` driver source; `index.html` is the page directory.
 - `mame-loader.js` loads MAME and exposes the browser bridge; `theme-simple.js` owns the page UI.
 - `cfg/` and `nvram/` contain seeded per-machine state.
 - `roms/` and `software/` are ignored, user-supplied directories. ROMs and software are not included.
@@ -24,7 +24,7 @@ EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 
 ### `start-web.sh`
 
-`start-web.sh` starts Python's built-in static HTTP server from the emame directory on port 8080. After building, run `./start-web.sh` and open `http://localhost:8080/index.html` (or a machine page such as `tbblue.html`) in a browser. Stop the server with Ctrl+C. ROMs and software must be supplied separately in the ignored `roms/` and `software/` directories.
+`start-web.sh` starts Python's built-in static HTTP server from the emame directory on port 8080. After building, run `./start-web.sh` and open `http://localhost:8080/index.html` (or a machine page such as `mame/sinclair/next/tbblue.html`) in a browser. Stop the server with Ctrl+C. ROMs and software must be supplied separately in the ignored `roms/` and `software/` directories.
 
 ### `res-info.py`
 

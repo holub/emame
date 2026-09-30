@@ -29,22 +29,22 @@ import sys
 import xml.etree.ElementTree as ET
 
 PAGES = {
-    "frogger": ["frogger.html"],
-    "pacman": ["pacman.html"],
-    "dkong": ["dkong.html"],
-    "tbblue": ["tbblue.html"],
-    "tsconf2": ["tsconf2-img.html", "tsconf2-trd.html", "tsconf2-spg.html"],
-    "scorpiongmx": ["scorpiongmx.html"],
-    "sprinter": ["sprinter.html"],
-    "atmtb2plus": ["atmtb2plus.html"],
-    "chloe": ["chloe.html"],
-    "pentevo": ["pentevo.html"],
-    "byte": ["byte.html"],
-    "spectrum": ["spectrum.html"],
-    "spec128": ["spec128.html"],
-    "specpls2": ["specpls2.html"],
-    "specpl2a": ["specpl2a.html"],
-    "specpls3": ["specpls3.html"],
+    "frogger": ["mame/galaxian/frogger.html"],
+    "pacman": ["mame/pacman/pacman.html"],
+    "dkong": ["mame/nintendo/dkong.html"],
+    "tbblue": ["mame/sinclair/next/tbblue.html"],
+    "tsconf2": ["mame/sinclair/evo/tsconf2-img.html", "mame/sinclair/evo/tsconf2-trd.html", "mame/sinclair/evo/tsconf2-spg.html"],
+    "scorpiongmx": ["mame/sinclair/scorpiongmx.html"],
+    "sprinter": ["mame/sinclair/sprinter.html"],
+    "atmtb2plus": ["mame/sinclair/atmtb2plus.html"],
+    "chloe": ["mame/sinclair/chloe.html"],
+    "pentevo": ["mame/sinclair/evo/pentevo.html"],
+    "byte": ["mame/sinclair/byte.html"],
+    "spectrum": ["mame/sinclair/spectrum.html"],
+    "spec128": ["mame/sinclair/spec128.html"],
+    "specpls2": ["mame/sinclair/specpls2.html"],
+    "specpl2a": ["mame/sinclair/specpl2a.html"],
+    "specpls3": ["mame/sinclair/specpls3.html"],
 }
 
 MAME_SRC = os.path.abspath(

@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>Chloe 280SE</title>
+    <title>Pac-Man</title>
+    <base href="../../">
   </head>
   <body>
     <div id="app"></div>
@@ -11,18 +12,15 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "chloe",
+        driver:  "pacman",
         files: [
-          { url: "cfg/chloe.cfg",          path: "cfg/chloe.cfg" },
-          { url: "roms/chloe.zip",         path: "roms/chloe.zip" },
-          { url: "roms/kb_ms_natural.zip", path: "roms/kb_ms_natural.zip" },
-          { url: "software/chloe280se_4g.img",     path: "chloe280se_4g.img" },
+          { url: "roms/pacman.zip", path: "roms/pacman.zip" },
+          { url: "roms/puckman.zip", path: "roms/puckman.zip" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
-          "-nokeepaspect", // wide guest doubles vertically: content 640x240 x(1,2), crisp at integer k
-          "-resolution", "640x480",
-          "-hard1", "chloe280se_4g.img"
+          "-nokeepaspect",
+          "-resolution", "576x896", //base: 288x448
         ],
       });
     </script>

@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>Pac-Man</title>
+    <title>ZX Spectrum +2</title>
+    <base href="../../">
   </head>
   <body>
     <div id="app"></div>
@@ -11,15 +12,14 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "pacman",
+        driver:  "specpls2",
         files: [
-          { url: "roms/pacman.zip", path: "roms/pacman.zip" },
-          { url: "roms/puckman.zip", path: "roms/puckman.zip" },
+          { url: "roms/specpls2.zip",   path: "roms/specpls2.zip" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
-          "-nokeepaspect",
-          "-resolution", "288x448",
+          "-nokeepaspect", // square pixels: content 352x296, 704x592 = 2x2
+          "-resolution", "704x592",
         ],
       });
     </script>

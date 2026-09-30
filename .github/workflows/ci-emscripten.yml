@@ -23,13 +23,13 @@ jobs:
         repository: mamedev/mame
         ref: master
         fetch-depth: 0
-        path: mame
+        path: mame-source
 
     - name: Merge emame-wip
       run: |
-        git -C mame remote add emame https://github.com/holub/mame.git
-        git -C mame fetch emame emame-wip
-        git -C mame -c user.name=ci -c user.email=ci@example.com merge --no-edit emame/emame-wip
+        git -C mame-source remote add emame https://github.com/holub/mame.git
+        git -C mame-source fetch emame emame-wip
+        git -C mame-source -c user.name=ci -c user.email=ci@example.com merge --no-edit emame/emame-wip
 
     - name: Install dependencies
       run: |
@@ -41,19 +41,19 @@ jobs:
 
     - name: Prepare for complay cache
       run: |
-        grep complay mame/makefile >mame/complay.prehash
-        cat mame/scripts/build/complay.py >>mame/complay.prehash
+        grep complay mame-source/makefile >mame-source/complay.prehash
+        cat mame-source/scripts/build/complay.py >>mame-source/complay.prehash
 
     - name: Cache complay-ed layouts
       uses: actions/cache@v4
       with:
-        path: ${{ github.workspace }}/mame/build/generated/mame/layout
-        key: complay_${{ hashFiles('mame/complay.prehash', 'mame/**/*.lay') }}
+        path: ${{ github.workspace }}/mame-source/build/generated/mame/layout
+        key: complay_${{ hashFiles('mame-source/complay.prehash', 'mame-source/**/*.lay') }}
 
     - name: Touch complay-ed layouts
       run: |
-        if [ -d mame/build/generated/mame/layout ]; then
-          find mame/build/generated/mame/layout -maxdepth 1 -name '*.lh' -exec touch {} +
+        if [ -d mame-source/build/generated/mame/layout ]; then
+          find mame-source/build/generated/mame/layout -maxdepth 1 -name '*.lh' -exec touch {} +
         fi
 
     - name: Install emscripten
@@ -64,7 +64,7 @@ jobs:
         ./emsdk activate 6.0.9
 
     - name: Build
-      working-directory: mame
+      working-directory: mame-source
       env:
         SUBTARGET: mame
         SOURCES: sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp,pacman/pacman.cpp,misc/epos.cpp,pacman/pengo.cpp,nintendo/dkong.cpp,galaxian/galaxian.cpp
@@ -80,13 +80,14 @@ jobs:
         export OVERRIDE_CXX="ccache em++"
         emmake make -j$(nproc)
 
-    - name: Prepare flat web artifact
+    - name: Prepare web artifact
       run: |
-        mkdir -p artifact artifact/cfg artifact/nvram artifact/roms artifact/software
-        cp mame/mame.html mame/mame.js mame/mame.wasm artifact/
-        cp mame/COPYING artifact/MAME-COPYING
-        cp -r mame/docs/legal artifact/MAME-LICENSES
-        cp mame-loader.js theme-simple.js RESOLUTION.md README.md LICENSE res-info.py start-web.sh *.html artifact/
+        mkdir -p artifact artifact/mame artifact/cfg artifact/nvram artifact/roms artifact/software
+        cp mame-source/mame.html mame-source/mame.js mame-source/mame.wasm artifact/
+        cp mame-source/COPYING artifact/MAME-COPYING
+        cp -r mame-source/docs/legal artifact/MAME-LICENSES
+        cp mame-loader.js theme-simple.js RESOLUTION.md README.md LICENSE res-info.py start-web.sh index.html artifact/
+        cp -r mame/. artifact/mame/
         cp -r cfg/. artifact/cfg/
         cp -r nvram/. artifact/nvram/
         echo "Place ROM files here" > artifact/roms/dir.txt

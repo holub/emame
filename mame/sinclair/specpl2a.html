@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>ATM Turbo 2+</title>
+    <title>ZX Spectrum +2A</title>
+    <base href="../../">
   </head>
   <body>
     <div id="app"></div>
@@ -11,17 +12,14 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "atmtb2plus",
+        driver:  "specpl2a",
         files: [
-          { url: "roms/atmtb2plus.zip",   path: "roms/atmtb2plus.zip" },
-          { url: "roms/betadisk.zip",     path: "roms/betadisk.zip" },
-          { url: "software/MCXVIEW.TRD",   path: "MCXVIEW.TRD" },
+          { url: "roms/specpl2a.zip",   path: "roms/specpl2a.zip" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
-          "-nokeepaspect", // square pixels: content 336x272, 672x544 = 2x2
-          "-resolution", "672x544",
-          "-flop1", "MCXVIEW.TRD"
+          "-nokeepaspect", // square pixels: content 352x296, 704x592 = 2x2
+          "-resolution", "704x592",
         ],
       });
     </script>

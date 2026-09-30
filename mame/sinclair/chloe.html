@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>ZX Spectrum +3</title>
+    <title>Chloe 280SE</title>
+    <base href="../../">
   </head>
   <body>
     <div id="app"></div>
@@ -11,15 +12,18 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "specpls3",
+        driver:  "chloe",
         files: [
-          { url: "roms/specpl2a.zip", path: "roms/specpl2a.zip" },
-          { url: "roms/specpls3.zip", path: "roms/specpls3.zip" },
+          { url: "cfg/chloe.cfg",          path: "cfg/chloe.cfg" },
+          { url: "roms/chloe.zip",         path: "roms/chloe.zip" },
+          { url: "roms/kb_ms_natural.zip", path: "roms/kb_ms_natural.zip" },
+          { url: "software/chloe280se_4g.img",     path: "chloe280se_4g.img" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
-          "-nokeepaspect", // square pixels: content 352x296, 704x592 = 2x2
-          "-resolution", "704x592",
+          "-nokeepaspect", // wide guest doubles vertically: content 640x240 x(1,2), crisp at integer k
+          "-resolution", "640x480",
+          "-hard1", "chloe280se_4g.img"
         ],
       });
     </script>

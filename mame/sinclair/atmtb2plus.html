@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>TSConf :: TR-DOS</title>
+    <title>ATM Turbo 2+</title>
+    <base href="../../">
   </head>
   <body>
     <div id="app"></div>
@@ -11,21 +12,18 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "tsconf2",
+        driver:  "atmtb2plus",
         files: [
-          { url: "cfg/tsconf2.cfg",           path: "cfg/tsconf2.cfg" },
-          { url: "nvram/tsconf2/glukrs_trd",  path: "nvramtrd/tsconf2/glukrs" },
-          { url: "roms/tsconf.zip",           path: "roms/tsconf.zip" },
-          { url: "roms/kb_ms_natural.zip",    path: "roms/kb_ms_natural.zip" },
-          { url: "software/TSDemo.trd",       path: "TSDemo.trd" },
+          { url: "roms/atmtb2plus.zip",   path: "roms/atmtb2plus.zip" },
+          { url: "roms/betadisk.zip",     path: "roms/betadisk.zip" },
+          { url: "software/MCXVIEW.TRD",   path: "MCXVIEW.TRD" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
-          "-resolution", "720x576",
-          "-nokeepaspect", // square pixels: content 360x288 natively square, 720x576 = 2x2
-          "-flop1", "TSDemo.trd"
+          "-nokeepaspect", // square pixels: content 336x272, 672x544 = 2x2
+          "-resolution", "672x544",
+          "-flop1", "MCXVIEW.TRD"
         ],
-        nvramDir: "nvramtrd",
       });
     </script>
   </body>

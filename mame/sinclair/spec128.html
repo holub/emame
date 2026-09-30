@@ -2,7 +2,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>PEVM Byte</title>
+    <title>ZX Spectrum 128</title>
+    <base href="../../">
   </head>
   <body>
     <div id="app"></div>
@@ -11,9 +12,9 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "byte",
+        driver:  "spec128",
         files: [
-          { url: "roms/byte.zip",   path: "roms/byte.zip" },
+          { url: "roms/spec128.zip",   path: "roms/spec128.zip" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
