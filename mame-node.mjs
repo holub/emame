@@ -78,5 +78,21 @@ await import(pathToFileURL(join(here, "mame.js")).href);
 
 // module body has run (ENVIRONMENT_IS_WEB stayed false); main() has not
 globalThis.window = { location: { search: "" } };
+// SDL reads the screen size at window creation (emscripten_get_screen_size);
+// node has no `screen` global — give SDL a sane desktop
+globalThis.screen = { width: 1920, height: 1080, availWidth: 1920, availHeight: 1040 };
+// and no DOM either — SDL2 probes fullscreen/visibility/pointer-lock state
+// through document.* EM_ASMs during init; answer "no/hidden desktop window"
+globalThis.document = {
+	fullscreenEnabled: false, webkitFullscreenEnabled: false,
+	fullscreenElement: null, webkitFullscreenElement: null,
+	pointerLockElement: null, visibilityState: "hidden", hidden: true,
+	title: "mame", activeElement: null, hasFocus: () => false,
+	body: null, documentElement: null, head: null,
+	addEventListener: () => {}, removeEventListener: () => {},
+	exitFullscreen: () => {}, exitPointerLock: () => {},
+	getElementById: () => null, querySelector: () => null,
+	createElement: () => ({ style: {}, getContext: () => null }),
+};
 if (globalThis.JSMAME && (memFiles.length || memDirs.length))
 	globalThis.JSMAME.preload = { files: memFiles, dirs: memDirs };
