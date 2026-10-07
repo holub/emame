@@ -86,7 +86,7 @@ jobs:
         cp mame-source/mame.html mame-source/mame.js mame-source/mame.wasm artifact/
         cp mame-source/COPYING artifact/MAME-COPYING
         cp -r mame-source/docs/legal artifact/MAME-LICENSES
-        cp mame-loader.js theme-simple.js machines.json run.html example-tbblue.html example-sprinter.html RESOLUTION.md README.md LICENSE res-info.py start-web.sh index.html artifact/
+        cp mame-loader.js theme-simple.js machines.json run.html example-tbblue.html example-sprinter.html RESOLUTION.md README.md LICENSE validate.py start-web.sh index.html artifact/
         cp -r cfg/. artifact/cfg/
         cp -r nvram/. artifact/nvram/
         echo "Place ROM files here" > artifact/roms/dir.txt

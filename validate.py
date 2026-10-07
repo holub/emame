@@ -1,23 +1,30 @@
 #!/usr/bin/env python3
-"""Suggest display frame size for each driver page from MAME -listxml ground truth.
+"""Validate machines.json: referenced assets exist and resolutions fit.
 
-Rule: take the primary screen (bare tag="screen"; slot screens ignored),
-compute the visible area from blanking (hbstart-hbend x vbstart-vbend,
-falling back to width x height), then search integer multipliers per axis
-within an 800x900 box, retaining 1x when that visible axis already exceeds
-its bound. Minimize |aspect - view-aspect|, where view-aspect is the
-effective aspect of the driver's boot default view read from the binary
-itself (headless Lua dump, one run per driver); fall back to 4:3 when the
-driver has no runnable ROMs. Break ties toward fewer pixels. When the
-default view is an artwork composite (has_art), integer screen scaling
-cannot express its aspect, so fit the view bounds into the box instead,
-floored at the screen suggestion so the embedded screen keeps natural size.
-
-Compares against the "-resolution" arg pinned in each .html page (device
+Resolution rule: take the primary screen (bare tag="screen"; slot screens
+ignored), compute the visible area from blanking (hbstart-hbend x
+vbstart-vbend, falling back to width x height), then search integer
+multipliers per axis within an 800x900 box, retaining 1x when that
+visible axis already exceeds its bound. Minimize |aspect -
+view-aspect|, where view-aspect is the effective aspect of the driver's
+boot default view read from the binary itself (headless Lua dump, one
+run per driver); fall back to 4:3 when the driver has no runnable
+ROMs. Break ties toward fewer pixels. When the default view is an
+artwork composite (has_art), integer screen scaling cannot express its
+aspect, so fit the view bounds into the box instead, floored at the
+screen suggestion so the embedded screen keeps natural size. Compares
+against the "resolution" field of each machines.json entry (device
 pixels).
 
+Asset rule: every file the runner would fetch must exist host-side —
+roms/<name>.zip for each entry of "roms", cfg/<driver>.cfg (or the
+given name) when "cfg" is set, software/<value> for each "media"
+option, and every explicit nvram/files url. Missing assets fail the
+run even when resolutions are fine; roms/ and software/ are per-host
+supplied, so a missing zip is a setup gap, not a machines.json bug.
+
 Views (executable-only, no sources needed):
-  res-info.py --views [driver ...]
+  validate.py --views [driver ...]
 Runs each driver headless with an inline Lua autoboot script reading
 manager.machine.render.targets (view_names/current_view) and prints all
 views, marking the boot default. Needs complete ROMs; exits 1 on NOROMS.
@@ -98,6 +105,20 @@ def current_marker(current, suggested):
     return current
 
 
+def missing_assets(slug, entry):
+    """Host-side files the runner would fetch; empty = all present."""
+    root = os.path.dirname(os.path.abspath(__file__))
+    driver = entry.get("driver", slug)
+    refs = [f"roms/{rom}.zip" for rom in entry.get("roms", [])]
+    if entry.get("cfg"):
+        name = entry["cfg"] if entry["cfg"] is not True else f"{driver}.cfg"
+        refs.append(f"cfg/{name}")
+    refs += ["software/" + val for val in (entry.get("media") or {}).values()]
+    refs += [n["url"] for n in entry.get("nvram", [])]
+    refs += [f["url"] for f in entry.get("files", [])]
+    return [r for r in refs if not os.path.isfile(os.path.join(root, r))]
+
+
 VIEWS_LUA = """-- dump views of the primary UI target (lowest index): DEFAULT <n>, VIEW <i>|<name>|<aspect>|<bounds>|<art>
 local render = manager.machine.render
 local ui = nil
@@ -139,7 +160,7 @@ def driver_views(driver, seconds=5, binary=None):
     with tempfile.NamedTemporaryFile("w", suffix=".lua", delete=False) as f:
         f.write(VIEWS_LUA)
         script = f.name
-    workdir = tempfile.mkdtemp(prefix="res-info-")
+    workdir = tempfile.mkdtemp(prefix="validate-")
     try:
         env = dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy")
         # sandbox every writable dir so the run creates nothing in cwd
@@ -232,6 +253,10 @@ def main(slugs):
     print(("# " + fmt % ("machine", "visible", "default-view", "aspect",
                          "suggested", "current")).rstrip(), flush=True)
     failed = False
+    for slug in slugs:
+        for path in missing_assets(slug, MACHINES[slug]):
+            print(f"MISSING {slug}: {path}", flush=True)
+            failed = True
     view_cache = {}
     for slug in slugs:
         entry = MACHINES[slug]

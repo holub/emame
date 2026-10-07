@@ -277,7 +277,7 @@ var MAMEThemeSimple = (function () {
     var status = root.querySelector("#status");
     var loadbar = root.querySelector("#loadbar");
     // Windowed frame: taken from the page's explicit "-resolution WxH" arg
-    // (device pixels, res-info.py values). It sizes the canvas backing (the
+    // (device pixels, validate.py values). It sizes the canvas backing (the
     // render target) and the windowed CSS box. MAME window sizes are CSS
     // points — SDL multiplies them by devicePixelRatio for the backing — so
     // the theme strips the arg and re-issues it as frame/dpr points to land

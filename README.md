@@ -38,17 +38,17 @@ EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 for d in frogger pacman dkong galaxian; do ./mame-js -verifyroms $d || echo "MISSING: $d"; done
 ```
 
-A single-set `-verifyroms` exits nonzero when the set is missing or bad — that is the reliable ROM-gate form; multi-set invocations skip missing sets silently and may exit zero. Machines also run headless (`-video none -str N`, `-autoboot_script`): SDL additionally probes `screen` and `document` during init, and the launcher stubs those the same way. This is why `res-info.py` is js-first — a native checkout is usually a stale subset of the driver list.
+A single-set `-verifyroms` exits nonzero when the set is missing or bad — that is the reliable ROM-gate form; multi-set invocations skip missing sets silently and may exit zero. Machines also run headless (`-video none -str N`, `-autoboot_script`): SDL additionally probes `screen` and `document` during init, and the launcher stubs those the same way. This is why `validate.py` is js-first — a native checkout is usually a stale subset of the driver list.
 
-### `res-info.py`
+### `validate.py`
 
-`res-info.py` checks the `resolution` field of each `machines.json` entry against frame sizes derived from MAME's `-listxml` data and the driver's boot-default view. With no arguments it checks every machine; pass machine slugs to limit the check. It searches integer-scaled frames within an 800x900 box, choosing the frame aspect closest to the effective view aspect and preferring the smaller frame on ties, so base dimensions remain the suggestion and configured integer upscales appear as `xM` in `current`. The taller box allows rotated arcade frames such as Frogger's 768x896 candidate; the old 800x600 cap excluded it. The `current` column prints `OK` for an exact match, `xM` for a uniform scale of the suggestion (for example, `x2` or `x1.5`), or the actual resolution when it matches neither.
+`validate.py` checks the `resolution` field of each `machines.json` entry against frame sizes derived from MAME's `-listxml` data and the driver's boot-default view. With no arguments it checks every machine; pass machine slugs to limit the check. It searches integer-scaled frames within an 800x900 box, choosing the frame aspect closest to the effective view aspect and preferring the smaller frame on ties, so base dimensions remain the suggestion and configured integer upscales appear as `xM` in `current`. The taller box allows rotated arcade frames such as Frogger's 768x896 candidate; the old 800x600 cap excluded it. The `current` column prints `OK` for an exact match, `xM` for a uniform scale of the suggestion (for example, `x2` or `x1.5`), or the actual resolution when it matches neither.
 Rows are printed and flushed as each driver check completes rather than buffered until all drivers finish.
 
 ```sh
-python3 res-info.py                       # check all machines
-python3 res-info.py tbblue tsconf2-img    # check selected machines
-python3 res-info.py --views tbblue         # list the driver's views/default
+python3 validate.py                       # check all machines
+python3 validate.py tbblue tsconf2-img    # check selected machines
+python3 validate.py --views tbblue         # list the driver's views/default
 ```
 
 The `--views` mode needs complete ROMs for each selected driver and exits nonzero when a driver cannot run. With no driver arguments, it lists views for all configured drivers.
@@ -58,7 +58,7 @@ The `--views` mode needs complete ROMs for each selected driver and exits nonzer
 1. Add the driver file(s) to `SOURCES` in both `build.sh` and the CI workflow; rebuild.
 2. ROM zips go to `roms/` (ignored, supplied per host).
 3. Add a `machines.json` entry. The key is the URL slug; `driver` only when it differs. Conventions: `roms` lists bare set names (parents and shared ROMs included, e.g. `kb_ms_natural`); `media` values live under `software/` and mount at their basename; `cfg: true` means `cfg/<driver>.cfg`. `nvram` stays explicit `{url, path}` — sources must be web-cache-unique (same file name fetched from different URLs serves the wrong demo after a cache hit) and may be renamed on the way in, so no convention is possible.
-4. `python3 res-info.py <slug>` until `current` prints `OK` or an integer multiple (`x2`).
+4. `python3 validate.py <slug>` — no `MISSING` lines, and `current` prints `OK` or an integer multiple (`x2`).
 5. Link `run.html?machine=<slug>` from `index.html`.
 
 ## Licensing

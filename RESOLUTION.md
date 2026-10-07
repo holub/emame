@@ -156,7 +156,7 @@ viewport re-render and the post-clamp correction possible.
 ### Page policy
 
 - every page lists `"-resolution", "<w>x<h>"` explicitly in `args`
-  (device pixels; `res-info.py` checks it against the listxml-derived
+  (device pixels; `validate.py` checks it against the listxml-derived
   suggestion);
 - every current page also lists `"-nokeepaspect"`: windowed fill with
   square target pixels, equivalent to desktop
