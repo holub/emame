@@ -59,10 +59,13 @@ TARGET = 4.0 / 3.0
 
 
 def primary_screen(machine):
-    for d in machine.iter("display"):
+    displays = list(machine.iter("display"))
+    for d in displays:
         if d.get("tag") == "screen":
             return d
-    return None
+    # dual-screen machines tag their screens (e.g. punchout top/bottom):
+    # the first display is the primary
+    return displays[0] if displays else None
 
 
 def visible(display):

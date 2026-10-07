@@ -44,7 +44,7 @@ if command -v ccache >/dev/null 2>&1; then
   export OVERRIDE_CXX="ccache em++"
 fi
 export SUBTARGET=mame
-export SOURCES="sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp,pacman/pacman.cpp,nintendo/dkong.cpp,galaxian/galaxian.cpp,konami/simpsons.cpp,williams/williams.cpp,capcom/1942.cpp"
+export SOURCES="sinclair/sprinter.cpp,sinclair/evo/tsconf.cpp,sinclair/scorpion.cpp,sinclair/next/specnext.cpp,samcoupe/samcoupe.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/atm.cpp,sinclair/byte.cpp,sinclair/evo/pentevo.cpp,sinclair/chloe.cpp,pacman/pacman.cpp,nintendo/dkong.cpp,galaxian/galaxian.cpp,konami/simpsons.cpp,williams/williams.cpp,capcom/1942.cpp,gottlieb/gottlieb.cpp,namco/polepos.cpp,namco/digdug.cpp,bally/mcr3.cpp,nintendo/punchout.cpp,sega/segas24.cpp,atari/atarisy2.cpp"
 export SEPARATE_BIN=1
 # BUILDDIR must be relative to MAME_SRC: genie.lua composes its paths as
 # MAME_DIR .. build-dir, and the makefile resolves $(BUILDDIR) from the

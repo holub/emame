@@ -23,7 +23,7 @@
     },
     "simpsons": {
       "name": "The Simpsons",
-      "resolution": "640x448",
+      "resolution": "1280x896",
       "roms": [
         "simpsons"
       ]
@@ -260,7 +260,7 @@
     },
     "robotron": {
       "name": "Robotron: 2084",
-      "resolution": "584x480",
+      "resolution": "1168x960",
       "roms": [
         "robotron"
       ],
@@ -269,6 +269,64 @@
           "url": "nvram/robotron/nvram",
           "path": "nvram/robotron/nvram"
         }
+      ]
+    },
+    "qbert": {
+      "name": "Q*bert",
+      "resolution": "512x720",
+      "roms": [
+        "qbert",
+        "votrsc01a"
+      ]
+    },
+    "polepos": {
+      "name": "Pole Position",
+      "resolution": "800x600",
+      "roms": [
+        "polepos",
+        "namco51",
+        "namco52",
+        "namco53",
+        "namco54"
+      ]
+    },
+    "digdug": {
+      "name": "Dig Dug",
+      "resolution": "576x896",
+      "roms": [
+        "digdug",
+        "namco51",
+        "namco53"
+      ]
+    },
+    "spyhunt": {
+      "name": "Spy Hunter",
+      "resolution": "649x900",
+      "roms": [
+        "spyhunt",
+        "midssio",
+        "midcsd"
+      ]
+    },
+    "punchout": {
+      "name": "Punch-Out!!",
+      "resolution": "512x896",
+      "roms": [
+        "punchout"
+      ]
+    },
+    "hotrod": {
+      "name": "Hot Rod",
+      "resolution": "992x768",
+      "roms": [
+        "hotrod"
+      ]
+    },
+    "ssprint": {
+      "name": "Super Sprint",
+      "resolution": "1024x768",
+      "roms": [
+        "ssprint"
       ]
     }
   }
