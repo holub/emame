@@ -1,0 +1,269 @@
+{
+  "machines": {
+    "1942": {
+      "name": "1942",
+      "resolution": "512x672",
+      "roms": [
+        "1942"
+      ]
+    },
+    "frogger": {
+      "name": "Frogger",
+      "resolution": "768x896",
+      "roms": [
+        "frogger"
+      ]
+    },
+    "galaxian": {
+      "name": "Galaxian",
+      "resolution": "768x896",
+      "roms": [
+        "galaxian"
+      ]
+    },
+    "simpsons": {
+      "name": "The Simpsons",
+      "resolution": "640x448",
+      "roms": [
+        "simpsons"
+      ]
+    },
+    "dkong": {
+      "name": "Donkey Kong",
+      "resolution": "512x672",
+      "roms": [
+        "dkong"
+      ]
+    },
+    "pacman": {
+      "name": "Pac-Man",
+      "resolution": "576x896",
+      "roms": [
+        "pacman",
+        "puckman"
+      ]
+    },
+    "atmtb2plus": {
+      "name": "ATM Turbo 2+",
+      "resolution": "672x544",
+      "roms": [
+        "atmtb2plus",
+        "betadisk"
+      ],
+      "media": {
+        "flop1": "MCXVIEW.TRD"
+      }
+    },
+    "byte": {
+      "name": "PEVM Byte",
+      "resolution": "704x592",
+      "roms": [
+        "byte"
+      ]
+    },
+    "chloe": {
+      "name": "Chloe 280SE",
+      "resolution": "640x480",
+      "roms": [
+        "chloe",
+        "kb_ms_natural"
+      ],
+      "media": {
+        "hard1": "chloe280se_4g.img"
+      },
+      "cfg": true
+    },
+    "pentevo": {
+      "name": "Pentevo :: TR-DOS :: NeoGS",
+      "resolution": "672x544",
+      "roms": [
+        "pentevo",
+        "betadisk",
+        "zxbus_neogs",
+        "kb_ms_natural"
+      ],
+      "media": {
+        "flop1": "MCXVIEW.TRD"
+      },
+      "cfg": true,
+      "nvram": [
+        {
+          "url": "nvram/pentevo/glukrs",
+          "path": "nvram/pentevo/glukrs"
+        }
+      ],
+      "slots": {
+        "zxbus1": "neogs"
+      },
+      "nmi": true
+    },
+    "tsconf2-img": {
+      "name": "TSConf :: SD + NeoGS",
+      "driver": "tsconf2",
+      "resolution": "720x576",
+      "roms": [
+        "tsconf",
+        "kb_ms_natural",
+        "zxbus_neogs"
+      ],
+      "media": {
+        "hard1": "wc.img"
+      },
+      "cfg": true,
+      "nvram": [
+        {
+          "url": "nvram/tsconf2/glukrs_sd",
+          "path": "nvramsd/tsconf2/glukrs"
+        }
+      ],
+      "slots": {
+        "zxbus1": "neogs",
+        "ay_slot": "ay_turbosound"
+      },
+      "nvram_dir": "nvramsd"
+    },
+    "tsconf2-spg": {
+      "name": "TSConf :: SPG",
+      "driver": "tsconf2",
+      "resolution": "720x576",
+      "roms": [
+        "tsconf",
+        "kb_ms_natural"
+      ],
+      "media": {
+        "dump": "cfparallax.spg"
+      },
+      "cfg": true
+    },
+    "tsconf2-trd": {
+      "name": "TSConf :: TR-DOS",
+      "driver": "tsconf2",
+      "resolution": "720x576",
+      "roms": [
+        "tsconf",
+        "kb_ms_natural"
+      ],
+      "media": {
+        "flop1": "TSDemo.trd"
+      },
+      "cfg": true,
+      "nvram": [
+        {
+          "url": "nvram/tsconf2/glukrs_trd",
+          "path": "nvramtrd/tsconf2/glukrs"
+        }
+      ],
+      "nvram_dir": "nvramtrd"
+    },
+    "tbblue": {
+      "name": "ZX Spectrum Next (tbblue)",
+      "resolution": "1080x864",
+      "roms": [
+        "tbblue"
+      ],
+      "media": {
+        "hard1": "next.chd"
+      },
+      "nmi": true,
+      "diff": true
+    },
+    "scorpiongmx": {
+      "name": "ScorpionGMX :: SMUC :: NeoGS",
+      "resolution": "704x592",
+      "roms": [
+        "scorpiongmx",
+        "zxbus_neogs",
+        "betadisk"
+      ],
+      "media": {
+        "flop1": "Z-PLAYERv4.1.TRD"
+      },
+      "nvram": [
+        {
+          "url": "nvram/scorpiongmx/zxbus_1_smuc_eeprom",
+          "path": "nvram/scorpiongmx/zxbus_1_smuc_eeprom"
+        },
+        {
+          "url": "nvram/scorpiongmx/zxbus_1_smuc_rtc",
+          "path": "nvram/scorpiongmx/zxbus_1_smuc_rtc"
+        }
+      ],
+      "slots": {
+        "zxbus:1": "smuc",
+        "zxbus:2": "neogs"
+      },
+      "nmi": true
+    },
+    "spec128": {
+      "name": "ZX Spectrum 128",
+      "resolution": "704x592",
+      "roms": [
+        "spec128"
+      ]
+    },
+    "specpl2a": {
+      "name": "ZX Spectrum +2A",
+      "resolution": "704x592",
+      "roms": [
+        "specpl2a"
+      ]
+    },
+    "specpls2": {
+      "name": "ZX Spectrum +2",
+      "resolution": "704x592",
+      "roms": [
+        "specpls2"
+      ]
+    },
+    "specpls3": {
+      "name": "ZX Spectrum +3",
+      "resolution": "704x592",
+      "roms": [
+        "specpl2a",
+        "specpls3"
+      ]
+    },
+    "spectrum": {
+      "name": "ZX Spectrum 48K",
+      "resolution": "704x592",
+      "roms": [
+        "spectrum"
+      ],
+      "media": {
+        "cassette": "AYtest_v0.2.tap"
+      }
+    },
+    "sprinter": {
+      "name": "Sprinter Sp2k",
+      "resolution": "824x576",
+      "roms": [
+        "sprinter",
+        "betadisk",
+        "zxbus_neogs",
+        "kb_ms_natural"
+      ],
+      "media": {
+        "hard1": "sp_hdd_sys.chd"
+      },
+      "cfg": true,
+      "nvram": [
+        {
+          "url": "nvram/sprinter_6/rtc",
+          "path": "nvram/sprinter_6/rtc"
+        }
+      ],
+      "bios": "v3.06",
+      "slots": {
+        "isa0": "zxbus_adapter",
+        "isa0:zxbus_adapter:card": "neogs"
+      }
+    },
+    "robotron": {
+      "name": "Robotron: 2084",
+      "resolution": "584x480",
+      "roms": [
+        "robotron"
+      ]
+    }
+  }
+}

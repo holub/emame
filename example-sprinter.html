@@ -2,8 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>Pentevo</title>
-    <base href="../../../">
+    <title>Sprinter Sp2k</title>
   </head>
   <body>
     <div id="app"></div>
@@ -12,24 +11,24 @@
     <script type="text/javascript" src="theme-simple.js"></script>
     <script type="text/javascript">
       MAMEThemeSimple.mount(document.getElementById("app"), {
-        driver:  "pentevo",
+        driver:  "sprinter",
         files: [
-          { url: "cfg/pentevo.cfg",        path: "cfg/pentevo.cfg" },
-          { url: "nvram/pentevo/glukrs",   path: "nvram/pentevo/glukrs" },
-          { url: "roms/pentevo.zip",       path: "roms/pentevo.zip" },
+          { url: "cfg/sprinter.cfg",       path: "cfg/sprinter.cfg" },
+          { url: "nvram/sprinter_6/rtc",    path: "nvram/sprinter_6/rtc" },
+          { url: "roms/sprinter.zip",      path: "roms/sprinter.zip" },
           { url: "roms/betadisk.zip",      path: "roms/betadisk.zip" },
           { url: "roms/zxbus_neogs.zip",   path: "roms/zxbus_neogs.zip" },
           { url: "roms/kb_ms_natural.zip", path: "roms/kb_ms_natural.zip" },
-          { url: "software/MCXVIEW.TRD",   path: "MCXVIEW.TRD" },
+          { url: "software/sp_hdd_sys.chd", path: "sp_hdd_sys.chd" },
         ],
         args: [
           "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
-          "-nokeepaspect", // square pixels: content 336x272, 672x544 = 2x2
-          "-resolution", "672x544",
-          "-zxbus1", "neogs",
-          "-flop1", "MCXVIEW.TRD"
+          "-nokeepaspect", // boot default is the System LEDs artwork view (1099x768 @1.4310): aspect-fit floored at the 736x576 screen frame so the screen keeps natural size
+          "-resolution", "824x576",
+          "-bios", "v3.06",
+          "-isa0", "zxbus_adapter", "-isa0:zxbus_adapter:card", "neogs",
+          "-hard1", "sp_hdd_sys.chd"
         ],
-        nmi: true,
       });
     </script>
   </body>

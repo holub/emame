@@ -22,34 +22,18 @@ Runs each driver headless with an inline Lua autoboot script reading
 manager.machine.render.targets (view_names/current_view) and prints all
 views, marking the boot default. Needs complete ROMs; exits 1 on NOROMS.
 """
+import json
 import os
 import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
-PAGES = {
-    "frogger": ["mame/galaxian/frogger.html"],
-    "galaxian": ["mame/galaxian/galaxian.html"],
-    "pacman": ["mame/pacman/pacman.html"],
-    "dkong": ["mame/nintendo/dkong.html"],
-    "simpsons": ["mame/konami/simpsons.html"],
-    "robotron": ["mame/williams/robotron.html"],
-    "1942": ["mame/capcom/1942.html"],
-    "tbblue": ["mame/sinclair/next/tbblue.html"],
-    "tsconf2": ["mame/sinclair/evo/tsconf2-img.html", "mame/sinclair/evo/tsconf2-trd.html", "mame/sinclair/evo/tsconf2-spg.html"],
-    "scorpiongmx": ["mame/sinclair/scorpiongmx.html"],
-    "sprinter": ["mame/sinclair/sprinter.html"],
-    "atmtb2plus": ["mame/sinclair/atmtb2plus.html"],
-    "chloe": ["mame/sinclair/chloe.html"],
-    "pentevo": ["mame/sinclair/evo/pentevo.html"],
-    "byte": ["mame/sinclair/byte.html"],
-    "spectrum": ["mame/sinclair/spectrum.html"],
-    "spec128": ["mame/sinclair/spec128.html"],
-    "specpls2": ["mame/sinclair/specpls2.html"],
-    "specpl2a": ["mame/sinclair/specpl2a.html"],
-    "specpls3": ["mame/sinclair/specpls3.html"],
-}
+# machine configurations live in machines.json (run.html renders them);
+# keys are page slugs, "driver" inside an entry overrides the slug
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                       "machines.json")) as _mf:
+    MACHINES = json.load(_mf)["machines"]
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MAME_SRC = os.path.abspath(
@@ -100,11 +84,6 @@ def suggest(vw, vh, target=TARGET):
     return best[1]
 
 
-def current_resolution(page):
-    with open(page) as f:
-        text = f.read()
-    m = re.search(r'"-resolution",\s*"(\d+)x(\d+)"', text)
-    return f"{m.group(1)}x{m.group(2)}" if m else "-"
 
 def current_marker(current, suggested):
     if current == suggested:
@@ -239,21 +218,30 @@ def default_view(driver):
     return None
 
 
-def main(drivers):
+def main(slugs):
+    for s in slugs:
+        if s not in MACHINES:
+            sys.exit(f"unknown machine: {s} (not in machines.json)")
+    drivers = sorted({MACHINES[s].get("driver", s) for s in slugs})
     root = os.path.dirname(os.path.abspath(__file__))
     xml = subprocess.run([MAME, "-listxml"] + drivers,
                          capture_output=True, text=True, check=True).stdout
     machines = {m.get("name"): m for m in ET.fromstring(xml).iter("machine")}
-    driver_width = max((len(driver) for driver in drivers), default=6)
-    fmt = f"%-{driver_width}s  %-9s %-24s  %-8s %-9s %s"
-    print(("# " + fmt % ("driver", "visible", "default-view", "aspect",
+    slug_width = max((len(s) for s in slugs), default=6)
+    fmt = f"%-{slug_width}s  %-9s %-24s  %-8s %-9s %s"
+    print(("# " + fmt % ("machine", "visible", "default-view", "aspect",
                          "suggested", "current")).rstrip(), flush=True)
     failed = False
-    for driver in drivers:
+    view_cache = {}
+    for slug in slugs:
+        entry = MACHINES[slug]
+        driver = entry.get("driver", slug)
         machine = machines[driver]
         disp = primary_screen(machine)
         vw, vh = visible(disp)
-        dv = default_view(driver)
+        if driver not in view_cache:
+            view_cache[driver] = default_view(driver)
+        dv = view_cache[driver]
         if dv is None:
             vname, frame = "NOROMS->4:3", suggest(vw, vh, TARGET)[:2]
             vaspect = TARGET
@@ -271,20 +259,19 @@ def main(drivers):
             vname, vaspect = dv[0], dv[1]
             frame = suggest(vw, vh, vaspect)[:2]
         w, h = frame
-        pages = PAGES.get(driver, [])
-        currents = {current_resolution(os.path.join(root, p)) for p in pages}
+        currents = {entry["resolution"]}
         suggested = f"{w}x{h}"
         current_print = ",".join(sorted(current_marker(c, suggested) for c in currents))
         failed |= currents != {suggested}
-        print(fmt % (driver, f"{vw}x{vh}", vname, f"{vaspect:.4f}",
+        print(fmt % (slug, f"{vw}x{vh}", vname, f"{vaspect:.4f}",
                      suggested, current_print), flush=True)
     sys.exit(1 if failed else 0)
 
 
 if __name__ == "__main__":
-    args = sys.argv[1:] or list(PAGES)
+    args = sys.argv[1:] or list(MACHINES)
     if "--views" in args:
-        args = [a for a in args if a != "--views"] or list(PAGES)
+        args = [a for a in args if a != "--views"] or list(MACHINES)
         views_main(args)
     else:
         main(args)

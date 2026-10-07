@@ -6,7 +6,7 @@ The repository contains the driver pages, browser loader/theme, per-machine conf
 
 ## Layout
 
-- Machine pages live under `mame/<source-directory>/`, mirroring their `src/mame/` driver source; `index.html` is the page directory.
+- Machine configurations live in `machines.json`; the universal `run.html?machine=<key>` page renders any entry, and `index.html` links to them (sections, order and labels are curated there).
 - `mame-loader.js` loads MAME and exposes the browser bridge; `theme-simple.js` owns the page UI.
 - `cfg/` and `nvram/` contain seeded per-machine state.
 - `roms/` and `software/` are ignored, user-supplied directories. ROMs and software are not included.
@@ -25,7 +25,7 @@ EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 
 ### `start-web.sh`
 
-`start-web.sh` starts Python's built-in static HTTP server from the emame directory on port 8080. After building, run `./start-web.sh` and open `http://localhost:8080/index.html` (or a machine page such as `mame/sinclair/next/tbblue.html`) in a browser. Stop the server with Ctrl+C. ROMs and software must be supplied separately in the ignored `roms/` and `software/` directories.
+`start-web.sh` starts Python's built-in static HTTP server from the emame directory on port 8080. After building, run `./start-web.sh` and open `http://localhost:8080/index.html` (or a machine page such as `run.html?machine=tbblue`) in a browser. Stop the server with Ctrl+C. ROMs and software must be supplied separately in the ignored `roms/` and `software/` directories.
 
 ### Headless CLI (`mame-js`)
 

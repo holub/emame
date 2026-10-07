@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>MAME</title>
+    <base href="">
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="text/javascript" src="mame-loader.js"></script>
+    <script type="text/javascript" src="theme-simple.js"></script>
+    <script type="text/javascript">
+      // Universal machine page: run.html?machine=<machines.json key>.
+      // The JSON carries only what varies (roms, media, slots, seeded
+      // state); the boilerplate every machine needs is composed here.
+      (function () {
+        var machine = new URLSearchParams(window.location.search).get("machine");
+        function fail(msg) {
+          var el = document.getElementById("app");
+          el.textContent = msg;
+          return;
+        }
+        if (!machine)
+          return fail("No ?machine= given. See index.html for the list.");
+        fetch("machines.json", { cache: "no-cache" }).then(function (r) {
+          if (!r.ok) throw new Error("machines.json: HTTP " + r.status);
+          return r.json();
+        }).then(function (data) {
+          var entry = data.machines[machine];
+          if (!entry)
+            return fail("Unknown machine: " + machine);
+          document.title = entry.name || machine;
+
+          var driver = entry.driver || machine;
+          var files = [];
+          var args = [
+            "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
+            "-nokeepaspect",
+          ];
+
+          (entry.roms || []).forEach(function (rom) {
+            files.push({ url: "roms/" + rom + ".zip", path: "roms/" + rom + ".zip" });
+          });
+          var media = entry.media || {};
+          Object.keys(media).forEach(function (opt) {
+            // media lives under software/ and is staged at its basename
+            var name = media[opt].split("/").pop();
+            files.push({ url: "software/" + media[opt], path: name });
+          });
+          if (entry.cfg) {
+            var cfg = entry.cfg === true ? driver + ".cfg" : entry.cfg;
+            files.push({ url: "cfg/" + cfg, path: "cfg/" + cfg });
+          }
+          // nvram stays explicit: sources are cache-unique and can be
+          // renamed on the way in (see machines.json)
+          (entry.nvram || []).forEach(function (n) {
+            files.push({ url: n.url, path: n.path });
+          });
+          (entry.files || []).forEach(function (f) { files.push(f); });
+
+          args.push("-resolution", entry.resolution);
+          if (entry.bios)
+            args.push("-bios", entry.bios);
+          var slots = entry.slots || {};
+          Object.keys(slots).forEach(function (opt) {
+            args.push("-" + opt, slots[opt]);
+          });
+          Object.keys(media).forEach(function (opt) {
+            args.push("-" + opt, media[opt].split("/").pop());
+          });
+          (entry.args || []).forEach(function (a) { args.push(a); });
+
+          MAMEThemeSimple.mount(document.getElementById("app"), {
+            driver: driver,
+            files: files,
+            args: args,
+            nmi: entry.nmi === true,
+            nvramDir: entry.nvram_dir || null,
+            diffDir: entry.diff === true,
+            bgfxInitialChain: entry.chain || "unfiltered",
+          });
+        }).catch(function (e) { fail("run.html: " + e.message); });
+      })();
+    </script>
+  </body>
+</html>
