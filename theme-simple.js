@@ -239,6 +239,7 @@ var MAMEThemeSimple = (function () {
     root.innerHTML =
       '<div id="controls">' +
         '<span id="reset">Reset</span>' +
+        '<span id="pause">Pause</span>' +
         (config.nmi === true ? '<span id="nmi">NMI</span>' : '') +
         '<span id="fullscr">Full Screen</span>' +
         '<span id="mute">Mute</span>' +
@@ -349,6 +350,14 @@ var MAMEThemeSimple = (function () {
     }
     // ---- UI hooks ----
     root.querySelector("#reset").onclick = function () { emulator.softReset(); };
+    var pauseBtn = root.querySelector("#pause");
+    if (pauseBtn) pauseBtn.onclick = function () {
+      var btn = this;
+      emulator.togglePause(function (p) {
+        btn.classList.toggle("on", p);
+        btn.textContent = p ? "Resume" : "Pause";
+      });
+    };
     root.querySelector("#fs-reset").onclick = function () { emulator.softReset(); };
     root.querySelector("#fullscr").onclick = function () { toggleFullscreen(); };
     root.querySelector("#mute").onclick = function () { var m = emulator.toggleMute(); this.textContent = m ? "Unmute" : "Mute"; };

@@ -324,6 +324,7 @@ var MAMELoader = (function () {
     var pendingAction = null;
       var muted = false;
       var showFps = false;
+      var paused = false;
     var api = {
       softReset: function () {
         if (ready && JSMAME && typeof JSMAME.soft_reset === "function") {
@@ -450,6 +451,27 @@ var MAMELoader = (function () {
           if (ready && typeof JSMAME !== "undefined" &&
               typeof JSMAME.set_fastforward === "function") {
             JSMAME.set_fastforward(on ? 1 : 0);
+            return true;
+          }
+          return false;
+        }
+        if (!fire()) {
+          var tries = 0;
+          var poll = setInterval(function () {
+            if (fire() || ++tries >= 120) clearInterval(poll);
+          }, 500);
+        }
+      },
+      // Pause toggle (machine pause, not main-loop pause; the page keeps
+      // repainting): returns the resulting paused state through
+      // cb(paused). The machine's answer wins over the tracked state so
+      // a native P-key pause cannot desync it.
+      togglePause: function (cb) {
+        function fire() {
+          if (ready && typeof JSMAME !== "undefined" &&
+              typeof JSMAME.set_paused === "function") {
+            paused = JSMAME.set_paused(paused ? 0 : 1) ? true : false;
+            cb(paused);
             return true;
           }
           return false;
