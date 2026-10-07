@@ -263,6 +263,12 @@
       "resolution": "584x480",
       "roms": [
         "robotron"
+      ],
+      "nvram": [
+        {
+          "url": "nvram/robotron/nvram",
+          "path": "nvram/robotron/nvram"
+        }
       ]
     }
   }
