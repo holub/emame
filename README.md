@@ -21,6 +21,7 @@ EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 ```
 
 `build.sh` compiles the sources in `MAME_SRC` but keeps objects, generated sources, and genie projects in this repository's `build/` (`BUILDDIR`). `SEPARATE_BIN=1` puts the linked Emscripten target in `build/asmjs/bin/`; the script copies `mame.html`, `mame.js`, and `mame.wasm` to this web root for serving. A native build in the MAME checkout uses its own `build/`, so the two build trees do not clobber each other or force recompiles.
+`build.sh` refuses to run unless `MAME_SRC` is on the `emame-wip` branch; pass `--skip-branch-check` to build from another branch anyway.
 
 ### `start-web.sh`
 

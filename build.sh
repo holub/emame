@@ -18,8 +18,26 @@ for output in mame.html mame.js mame.wasm; do
 done
 EMSDK_DIR="${EMSDK_DIR:-$HOME/workspace/emsdk}"
 . "$EMSDK_DIR/emsdk_env.sh"
+SKIP_BRANCH_CHECK=0
+for arg in "$@"; do
+  case "$arg" in
+    --skip-branch-check) SKIP_BRANCH_CHECK=1 ;;
+    *) echo "build.sh: unknown argument: $arg (only --skip-branch-check is supported)" >&2; exit 2 ;;
+  esac
+done
 MAME_SRC="${MAME_SRC:-$WEB_ROOT/../mame}"
 MAME_SRC=$(cd "$MAME_SRC" && pwd)
+# Building from a different branch silently produces artifacts from the wrong
+# tree (this happened twice: em-loop instead of emame-wip). Fail early unless
+# explicitly overridden.
+if [ "$SKIP_BRANCH_CHECK" -ne 1 ]; then
+  branch=$(git -C "$MAME_SRC" rev-parse --abbrev-ref HEAD)
+  if [ "$branch" != "emame-wip" ]; then
+    echo "build.sh: $MAME_SRC is on branch '$branch', expected 'emame-wip'." >&2
+    echo "build.sh: switch branches, or rerun with --skip-branch-check." >&2
+    exit 1
+  fi
+fi
 cd "$MAME_SRC"
 if command -v ccache >/dev/null 2>&1; then
   export OVERRIDE_CC="ccache emcc"
