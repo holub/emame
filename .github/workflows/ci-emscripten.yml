@@ -82,12 +82,11 @@ jobs:
 
     - name: Prepare web artifact
       run: |
-        mkdir -p artifact artifact/mame artifact/cfg artifact/nvram artifact/roms artifact/software
+        mkdir -p artifact artifact/cfg artifact/nvram artifact/roms artifact/software
         cp mame-source/mame.html mame-source/mame.js mame-source/mame.wasm artifact/
         cp mame-source/COPYING artifact/MAME-COPYING
         cp -r mame-source/docs/legal artifact/MAME-LICENSES
-        cp mame-loader.js theme-simple.js RESOLUTION.md README.md LICENSE res-info.py start-web.sh index.html artifact/
-        cp -r mame/. artifact/mame/
+        cp mame-loader.js theme-simple.js machines.json run.html example-tbblue.html example-sprinter.html RESOLUTION.md README.md LICENSE res-info.py start-web.sh index.html artifact/
         cp -r cfg/. artifact/cfg/
         cp -r nvram/. artifact/nvram/
         echo "Place ROM files here" > artifact/roms/dir.txt
