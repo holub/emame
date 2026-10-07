@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>The Simpsons</title>
+    <base href="../../">
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="text/javascript" src="mame-loader.js"></script>
+    <script type="text/javascript" src="theme-simple.js"></script>
+    <script type="text/javascript">
+      MAMEThemeSimple.mount(document.getElementById("app"), {
+        driver:  "simpsons",
+        files: [
+          { url: "roms/simpsons.zip", path: "roms/simpsons.zip" },
+        ],
+        args: [
+          "-window", "-video", "bgfx", "-bgfx_screen_chains", "unfiltered",
+          "-nokeepaspect",
+          "-resolution", "640x448",
+        ],
+      });
+    </script>
+  </body>
+</html>
