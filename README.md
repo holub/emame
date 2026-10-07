@@ -22,6 +22,7 @@ EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 
 `build.sh` compiles the sources in `MAME_SRC` but keeps objects, generated sources, and genie projects in this repository's `build/` (`BUILDDIR`). `SEPARATE_BIN=1` puts the linked Emscripten target in `build/asmjs/bin/`; the script copies `mame.html`, `mame.js`, and `mame.wasm` to this web root for serving. A native build in the MAME checkout uses its own `build/`, so the two build trees do not clobber each other or force recompiles.
 `build.sh` refuses to run unless `MAME_SRC` is on the `emame-wip` branch; pass `--skip-branch-check` to build from another branch anyway.
+`BUILDDIR` must stay relative to the MAME checkout: genie composes `MAME_DIR .. BUILDDIR`, so an absolute path generates the makefiles into a bogus tree and the build dies on a missing project file.
 
 ### `start-web.sh`
 
@@ -37,20 +38,28 @@ EMSDK_DIR="$HOME/workspace/emsdk" MAME_SRC="$HOME/workspace/mame" ./build.sh
 for d in frogger pacman dkong galaxian; do ./mame-js -verifyroms $d || echo "MISSING: $d"; done
 ```
 
-A single-set `-verifyroms` exits nonzero when the set is missing or bad — that is the reliable ROM-gate form; multi-set invocations skip missing sets silently and may exit zero. Booting machines (running a driver) still requires a browser; info and audit commands are the headless surface.
+A single-set `-verifyroms` exits nonzero when the set is missing or bad — that is the reliable ROM-gate form; multi-set invocations skip missing sets silently and may exit zero. Machines also run headless (`-video none -str N`, `-autoboot_script`): SDL additionally probes `screen` and `document` during init, and the launcher stubs those the same way. This is why `res-info.py` is js-first — a native checkout is usually a stale subset of the driver list.
 
 ### `res-info.py`
 
-`res-info.py` checks page `-resolution` arguments against frame sizes derived from MAME's `-listxml` data and the driver's boot-default view. With no driver arguments it checks every configured page; pass driver short names to limit the check. It searches integer-scaled frames within an 800x900 box, choosing the frame aspect closest to the effective view aspect and preferring the smaller frame on ties, so base dimensions remain the suggestion and configured integer upscales appear as `xM` in `current`. The taller box allows rotated arcade frames such as Frogger's 768x896 candidate; the old 800x600 cap excluded it. The `current` column prints `OK` for an exact match, `xM` for a uniform scale of the suggestion (for example, `x2` or `x1.5`), or the actual resolution for other mismatches. It still exits nonzero unless every current page resolution exactly matches the suggestion. If a driver cannot be run because ROMs are missing, it falls back to a 4:3 suggestion. `-listxml` runs through `./mame-js` when available (the shipped binary knows every driver in the build), otherwise `$MAME_SRC/mame`; `MAME` still overrides the executable. Boot-time view dumps first try the same binary, then fall back to `MAME_NATIVE` (default `$MAME_SRC/mame`) when present, since the js build cannot boot machines without a browser. Headless runs use `MAME_ROMPATH` when set, otherwise this repository's `roms/` directory if present.
+`res-info.py` checks the `resolution` field of each `machines.json` entry against frame sizes derived from MAME's `-listxml` data and the driver's boot-default view. With no arguments it checks every machine; pass machine slugs to limit the check. It searches integer-scaled frames within an 800x900 box, choosing the frame aspect closest to the effective view aspect and preferring the smaller frame on ties, so base dimensions remain the suggestion and configured integer upscales appear as `xM` in `current`. The taller box allows rotated arcade frames such as Frogger's 768x896 candidate; the old 800x600 cap excluded it. The `current` column prints `OK` for an exact match, `xM` for a uniform scale of the suggestion (for example, `x2` or `x1.5`), or the actual resolution when it matches neither.
 Rows are printed and flushed as each driver check completes rather than buffered until all drivers finish.
 
 ```sh
-python3 res-info.py                       # check all configured pages
-python3 res-info.py tbblue tsconf2        # check selected drivers
+python3 res-info.py                       # check all machines
+python3 res-info.py tbblue tsconf2-img    # check selected machines
 python3 res-info.py --views tbblue         # list the driver's views/default
 ```
 
 The `--views` mode needs complete ROMs for each selected driver and exits nonzero when a driver cannot run. With no driver arguments, it lists views for all configured drivers.
+
+## Adding a machine
+
+1. Add the driver file(s) to `SOURCES` in both `build.sh` and the CI workflow; rebuild.
+2. ROM zips go to `roms/` (ignored, supplied per host).
+3. Add a `machines.json` entry. The key is the URL slug; `driver` only when it differs. Conventions: `roms` lists bare set names (parents and shared ROMs included, e.g. `kb_ms_natural`); `media` values live under `software/` and mount at their basename; `cfg: true` means `cfg/<driver>.cfg`. `nvram` stays explicit `{url, path}` — sources must be web-cache-unique (same file name fetched from different URLs serves the wrong demo after a cache hit) and may be renamed on the way in, so no convention is possible.
+4. `python3 res-info.py <slug>` until `current` prints `OK` or an integer multiple (`x2`).
+5. Link `run.html?machine=<slug>` from `index.html`.
 
 ## Licensing
 
@@ -58,10 +67,12 @@ The emame web-front source is licensed under BSD-3-Clause; see `LICENSE`. CI art
 
 ## Patch set carried on `emame-wip`
 
-These changes are applied on top of `mame/master` by the CI workflow:
+`emame-wip` is kept rebased on `mame/master`; the CI merge step is only a fallback and intentionally fails on conflicts, signalling that a rebase is due.
 
 - `running_machine` browser bridges (`emscripten_set_bgfx_chain`, `emscripten_resize_window`, `emscripten_set_keepaspect`, `emscripten_set_fastforward`, and `emscripten_cassette_toggle`) plus the cassette tape-end watch.
-- Callback-delta run-loop pacing and CPU-bound unthrottled fast-forward.
+- `running_machine::emscripten_set_paused` machine pause for the web pages, with the audio sink told about deliberate drain (no false underruns while paused).
+- `scripts/src/3rdparty.lua` takes the asmjs toolchain down the clang path of its warning flags.
+- Wall-clock master run-loop pacing (MAME's internal throttle stays off) and CPU-budget unthrottled fast-forward.
 - Runtime bgfx chain switching through `osd_common_t::set_bgfx_screen_chain`, `renderer_bgfx::set_effect_chain`, `chain_manager::set_chain_by_name`, and `osd_renderer::set_effect_chain`.
 - Emscripten `EXPORTED_FUNCTIONS` additions and `emscripten_post.js` cwrap bindings deferred until first call.
 - `infoxml.cpp` runs `-listxml` tasks with `std::launch::deferred` on Emscripten (no pthreads; the default `std::launch::async` throws), keeping headless `-listxml` working under node.
